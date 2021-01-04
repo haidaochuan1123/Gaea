@@ -6,29 +6,24 @@ gaea配置由两部分组成，本地配置为gaea_proxy直接使用的配置内
 
 ```ini
 ; 配置类型，目前支持file/etcd两种方式，file方式不支持热加载，但是可以快速体验功能
+; file 模式下读取file_config_path下的namespace配置文件
+; etcd 模式下读取coordinator_addr/cluster_name下的namespace配置文件
 config_type=etcd
-
 ;file config path, 具体配置放到file_config_path的namespace目录下，该下级目录为固定目录
 file_config_path=./etc/file
 
 ;配置中心地址，目前只支持etcd
 coordinator_addr=http://127.0.0.1:2379
-
-;远程配置(当前为etcd)根目录
-coordinator_root=/gaea
-
 ;配置中心用户名和密码
 username=test
 password=test
 
 ;环境划分、test、online
-environ=test
-
-;组和服务名称，为服务化做准备
-group_name=systech
-
+environ=test 
 ;service name
 service_name=gaea_proxy
+;gaea_proxy 当前proxy所属的集群名称
+cluster_name=gaea_default_cluster
 
 ;日志配置
 log_path=./logs
@@ -48,16 +43,17 @@ proxy_addr=0.0.0.0:13306
 
 ; 默认编码
 proxy_charset=utf8
-
 ;慢sql阈值，单位: 毫秒
 slow_sql_time=100
-
 ;空闲会话超时时间,单位: 秒
 session_timeout=3600
 
 ;打点统计配置
 stats_enabled=true
-stats_backend_type=prometheus
+stats_interval=10 
+
+;encrypt key, 用于对etcd中存储的namespace配置加解密
+encrypt_key=1234abcd5678efg*
 ```
 
 ## namespace配置说明
@@ -95,6 +91,8 @@ namespace的配置格式为json，包含分表、非分表、实例等配置信�
 ### shard配置
 
 这里列出了一些基本配置参数, 详细配置请参考[分片表配置](shard.md)
+
+如需要了解每种规则详细库表对照示例，可以查看[分片规则示例说明](shard-example.md)
 
 | 字段名称   | 字段类型 | 字段含义 |
 | --------- | -------- | --------------------- |
